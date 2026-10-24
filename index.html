@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Dwelling 3D — Encontre seu imóvel ideal | Empreendimentos em São Paulo</title>
+    <meta
+      name="description"
+      content="Versão 3D interativa do portal de empreendimentos: 14 lançamentos da Econ e Metrocasa em São Paulo, com fotos originais, filtros dinâmicos e showroom 3D."
+    />
+    <meta name="author" content="Dwelling 3D" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dwelling 3D — Encontre seu imóvel ideal" />
+    <meta
+      property="og:description"
+      content="Explore 14 empreendimentos de São Paulo em um carrossel 3D com as fotos originais."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230a0a0a'/%3E%3Cpath d='M18 44V26l14-9 14 9v18z' fill='none' stroke='%23cc9933' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M28 44V32h8v12' fill='none' stroke='%23cc9933' stroke-width='4'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three.module.js" } }
+    </script>
+  </head>
+
+  <body>
+    <!-- ================================ CENA 3D =============================== -->
+    <canvas id="scene" aria-label="Cena 3D dos empreendimentos"></canvas>
+    <div class="vinheta"></div>
+    <div class="grain"></div>
+
+    <!-- ================================ LOADER =============================== -->
+    <div id="loader">
+      <div class="loader-box">
+        <span class="marca"><span class="cubo"></span> Dwelling 3D</span>
+        <p>Carregando a experiência imersiva — <span id="pct-loading">0%</span></p>
+        <div class="barra" id="barra-progresso"><span></span></div>
+        <div class="loader-dica" id="dica-loading">Preparando a cidade 3D…</div>
+      </div>
+    </div>
+
+    <!-- ================================ TOPO ================================= -->
+    <header class="topo">
+      <a class="marca" href="#" onclick="location.hash='';location.reload();return false;">
+        <span class="cubo"></span> Dwelling <span style="color: var(--gold)">3D</span>
+      </a>
+
+      <nav class="nav" id="topo-nav" aria-label="Navegação principal">
+        <button type="button" id="btn-explorar-topo" data-vista="galeria">Empreendimentos</button>
+        <button type="button" id="btn-grade" data-vista="grade">Grade 2D</button>
+        <button type="button" id="btn-contato-topo" data-vista="contato">Contato</button>
+      </nav>
+
+      <div class="topo-acoes">
+        <a class="btn btn-sm" href="tel:+5511910456624">📞 <span class="rotulo-longo">(11) 91045-6624</span></a>
+        <a
+          class="btn btn-sm btn-ouro"
+          href="https://wa.me/5511910456624?text=Ol%C3%A1%21%20Gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20os%20empreendimentos."
+          target="_blank"
+          rel="noopener"
+          >💬 WhatsApp</a
+        >
+      </div>
+    </header>
+
+    <!-- ================================ HERO ================================= -->
+    <section class="hero oculto" id="hero">
+      <div class="hero-inner">
+        <span class="selo"><span class="ponto"></span> 14 empreendimentos · São Paulo</span>
+        <h1>Encontre seu <span class="dourado">imóvel ideal</span></h1>
+        <p>
+          Empreendimentos selecionados em São Paulo com as melhores condições de financiamento —
+          agora em uma experiência <b>3D interativa</b>, com as <b>fotos originais</b> de cada projeto.
+        </p>
+
+        <div class="hero-acoes">
+          <button class="btn btn-ouro" id="btn-explorar" type="button">🚀 Explorar em 3D</button>
+          <button class="btn" id="btn-contato-hero" type="button">💬 Falar com um consultor</button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat"><b id="contagem-hero">14</b><span>Empreendimentos</span></div>
+          <div class="stat"><b id="fotos-hero">42</b><span>Fotos originais</span></div>
+          <div class="stat"><b>6</b><span>Zonas de SP</span></div>
+          <div class="stat"><b>2</b><span>Construtoras</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== FILTROS ================================ -->
+    <section class="painel-filtros" id="filtros" aria-label="Filtros de empreendimentos">
+      <div class="linha-filtros" id="chips-filtros"></div>
+
+      <div class="linha-filtros">
+        <div class="busca">
+          <span class="lupa">🔍</span>
+          <input
+            id="busca"
+            type="search"
+            placeholder="Buscar por nome, bairro, tipologia…"
+            aria-label="Buscar empreendimento"
+          />
+        </div>
+        <button class="chip" id="limpar-filtros" type="button">↺ Limpar filtros</button>
+      </div>
+
+      <div class="resultado" id="resultado-dinamico">
+        <b id="contador-num">14</b> empreendimentos encontrados
+      </div>
+    </section>
+
+    <!-- ============================ DOCK LATERAL ============================= -->
+    <aside class="dock" id="dock" aria-label="Índice de empreendimentos"></aside>
+
+    <!-- =========================== NAVEGAÇÃO 3D ============================= -->
+    <div class="nav-3d" id="nav-3d">
+      <button type="button" id="anterior-anel" aria-label="Empreendimento anterior">←</button>
+      <span class="dica-girar" id="dica-girar">Arraste para girar · ← → para navegar</span>
+      <button type="button" id="proximo-anel" aria-label="Próximo empreendimento">→</button>
+    </div>
+
+    <!-- =========================== PAINEL DETALHE =========================== -->
+    <aside class="detalhe" id="painel-detalhe" aria-label="Detalhes do empreendimento"></aside>
+
+    <!-- ============================= LIGHTBOX =============================== -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Foto ampliada">
+      <span class="lb-cont" id="lb-cont">1 / 3</span>
+      <button class="lb-nav lb-fechar" id="lb-fechar" type="button" aria-label="Fechar">✕</button>
+      <button class="lb-nav lb-prev" id="lb-prev" type="button" aria-label="Foto anterior">←</button>
+      <button class="lb-nav lb-next" id="lb-next" type="button" aria-label="Próxima foto">→</button>
+      <figure>
+        <img id="lb-img" src="" alt="" />
+        <figcaption id="lb-cap"></figcaption>
+      </figure>
+    </div>
+
+    <!-- ============================== TOAST ================================= -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- =========================== FALLBACK 2D ============================== -->
+    <section id="fallback" aria-label="Grade de empreendimentos">
+      <div style="max-width: 1240px; margin: 0 auto 26px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: center">
+        <div>
+          <h2 style="font-size: 1.5rem; letter-spacing: -0.02em">Empreendimentos</h2>
+          <p style="color: var(--txt-2); font-size: 0.88rem; margin-top: 5px">
+            Visualização em grade — clique em um card para ver fotos originais e detalhes.
+          </p>
+        </div>
+        <button class="btn" type="button" onclick="document.getElementById('btn-grade').click()">Voltar ao 3D</button>
+      </div>
+      <div class="grade" id="grade-2d"></div>
+    </section>
+
+    <!-- ============================== RODAPÉ ================================ -->
+    <div class="rodape-info" id="rodape-info">
+      © 2026 — Todos os direitos reservados<br />
+      Versão 3D interativa do
+      <a href="https://dwelling-shine-show.lovable.app/" target="_blank" rel="noopener">portal original</a>
+    </div>
+
+    <noscript>
+      <div style="position: fixed; inset: 0; z-index: 200; background: #0a0a0a; padding: 40px; color: #f4f1ea">
+        <h1>Dwelling 3D</h1>
+        <p>Ative o JavaScript para explorar os empreendimentos em 3D.</p>
+      </div>
+    </noscript>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
