@@ -13,7 +13,7 @@ import {
   ICONES_LAZER,
   ICONES_DIFERENCIAIS,
 } from "./data.js";
-import { Mundo } from "./scene.js";
+import { MundoV2 as Mundo } from "./scene-v2.js";
 
 const $ = (seletor, raiz = document) => raiz.querySelector(seletor);
 const $$ = (seletor, raiz = document) => [...raiz.querySelectorAll(seletor)];
